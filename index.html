@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .check-icon {
+            width: 50px;
+            height: 50px;
+            background: #00ff88;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #00ff88;
+            color: #333;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #00cc6a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .checklist-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section-number {
+            width: 60px;
+            height: 60px;
+            background: #00ffdd;
+            color: #333;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .checklist-item.checked {
+            background: #d4edda;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: #00ff88;
+            border-color: #00ff88;
+        }
+
+        .checklist-item.checked .checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .item-text {
+            color: #333;
+            font-size: 16px;
+            flex-grow: 1;
+        }
+
+        .checklist-item.checked .item-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .progress-track {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ffdd);
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .add-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .checklist-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <span class="check-icon">✓</span>
+                GERENCIADOR DE CHECKLIST
+            </h1>
+            <div class="controls">
+                <button onclick="downloadConfig()">📥 Download JSON</button>
+                <button onclick="document.getElementById('fileInput').click()">📤 Upload JSON</button>
+                <button onclick="resetChecklist()">🔄 Resetar Checklist</button>
+                <button onclick="clearAll()">🗑️ Limpar Tudo</button>
+            </div>
+            <input type="file" id="fileInput" accept=".json" onchange="uploadConfig(event)">
+        </header>
+
+        <div class="progress-bar">
+            <div class="progress-header">
+                <span>Progresso Total</span>
+                <span id="progressText">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="checklist-grid" id="checklistGrid"></div>
+
+        <div class="add-section">
+            <h3>➕ Adicionar Nova Seção</h3>
+            <input type="text" id="newSectionTitle" placeholder="Título da seção (ex: DESIGN)">
+            <textarea id="newSectionItems" placeholder="Itens (um por linha)&#10;Ex:&#10;Check responsiveness&#10;Validate HTML/CSS&#10;Optimize images"></textarea>
+            <button onclick="addSection()">Adicionar Seção</button>
+        </div>
+    </div>
+
+    <script>
+        let checklistData = {
+            sections: [
+                {
+                    title: "DESIGN",
+                    items: [
+                        "Check responsiveness",
+                        "Validate HTML/CSS",
+                        "Optimize scripts",
+                        "Optimize images",
+                        "Optimize CSS",
+                        "Upload favicon",
+                        "Check paragraph styles"
+                    ]
+                },
+                {
+                    title: "FUNCTIONALITY",
+                    items: [
+                        "Check submission forms and feedback",
+                        "Check storage and email notifications",
+                        "Check auto-responders",
+                        "Test internal links",
+                        "Test external links (open in new tab)",
+                        "Test social media links",
+                        "Click header logo to see if it links to homepage",
+                        "Test loading speed",
+                        "Check 404 redirects",
+                        "Test integrations"
+                    ]
+                }
+            ]
+        };
+
+        let checkedItems = {};
+
+        function renderChecklist() {
+            const grid = document.getElementById('checklistGrid');
+            grid.innerHTML = '';
+
+            checklistData.sections.forEach((section, sectionIndex) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'checklist-section';
+
+                const header = document.createElement('div');
+                header.className = 'section-header';
+                header.innerHTML = `
+                    <div class="section-number">${sectionIndex + 1}</div>
+                    <div class="section-title">${section.title}</div>
+                `;
+                sectionDiv.appendChild(header);
+
+                section.items.forEach((item, itemIndex) => {
+                    const itemDiv = document.createElement('div');
+                    const itemId = `${sectionIndex}-${itemIndex}`;
+                    itemDiv.className = `checklist-item ${checkedItems[itemId] ? 'checked' : ''}`;
+                    itemDiv.onclick = () => toggleItem(itemId);
+                    
+                    itemDiv.innerHTML = `
+                        <div class="checkbox"></div>
+                        <div class="item-text">${item}</div>
+                    `;
+                    sectionDiv.appendChild(itemDiv);
+                });
+
+                grid.appendChild(sectionDiv);
+            });
+
+            updateProgress();
+            saveToLocalStorage();
+        }
+
+        function toggleItem(itemId) {
+            checkedItems[itemId] = !checkedItems[itemId];
+            renderChecklist();
+        }
+
+        function updateProgress() {
+            const totalItems = checklistData.sections.reduce((sum, section) => sum + section.items.length, 0);
+            const checkedCount = Object.values(checkedItems).filter(v => v).length;
+            const percentage = totalItems > 0 ? Math.round((checkedCount / totalItems) * 100) : 0;
+
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = percentage + '%';
+        }
+
+        function downloadConfig() {
+            const config = {
+                checklist: checklistData,
+                progress: checkedItems
+            };
+            
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `checklist-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function uploadConfig(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const config = JSON.parse(e.target.result);
+                    if (config.checklist) {
+                        checklistData = config.checklist;
+                    }
+                    if (config.progress) {
+                        checkedItems = config.progress;
+                    }
+                    renderChecklist();
+                    alert('Checklist carregada com sucesso!');
+                } catch (error) {
+                    alert('Erro ao carregar arquivo JSON: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetChecklist() {
+            if (confirm('Deseja resetar todos os itens marcados?')) {
+                checkedItems = {};
+                renderChecklist();
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Deseja limpar todas as seções e itens? Esta ação não pode ser desfeita.')) {
+                checklistData.sections = [];
+                checkedItems = {};
+                renderChecklist();
+            }
+        }
+
+        function addSection() {
+            const title = document.getElementById('newSectionTitle').value.trim();
+            const itemsText = document.getElementById('newSectionItems').value.trim();
+
+            if (!title || !itemsText) {
+                alert('Por favor, preencha o título e os itens da seção.');
+                return;
+            }
+
+            const items = itemsText.split('\n').filter(item => item.trim()).map(item => item.trim());
+
+            checklistData.sections.push({
+                title: title,
+                items: items
+            });
+
+            document.getElementById('newSectionTitle').value = '';
+            document.getElementById('newSectionItems').value = '';
+            
+            renderChecklist();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('checklistData', JSON.stringify(checklistData));
+            localStorage.setItem('checkedItems', JSON.stringify(checkedItems));
+        }
+
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('checklistData');
+            const savedChecked = localStorage.getItem('checkedItems');
+
+            if (savedData) {
+                checklistData = JSON.parse(savedData);
+            }
+            if (savedChecked) {
+                checkedItems = JSON.parse(savedChecked);
+            }
+        }
+
+        loadFromLocalStorage();
+        renderChecklist();
+    </script>
+</body>
+</html>
