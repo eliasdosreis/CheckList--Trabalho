@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciador de Checklist</title>
+    <title>Web Design Checklist</title>
     <style>
         * {
             margin: 0;
@@ -12,47 +12,115 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            background: #4338ca;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        /* Decorative corner */
+        .corner-deco {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 90px;
+            height: 90px;
+            border-left: 6px solid #06b6d4;
+            border-top: 6px solid #06b6d4;
+            z-index: 10;
         }
 
-        h1 {
-            color: white;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        .dots-deco {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #06b6d4;
+            border-radius: 2px;
+        }
+
+        .arrow-deco {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            z-index: 10;
+        }
+
+        .arrow-deco::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 6px;
+            background: #06b6d4;
+            transform: rotate(-45deg);
+            top: 20px;
+            right: 0;
+        }
+
+        .arrow-deco::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 60px;
+            background: #06b6d4;
+            transform: rotate(-45deg);
+            top: 20px;
+            right: 0;
+        }
+
+        header {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .check-icon {
-            width: 50px;
-            height: 50px;
-            background: #00ff88;
+            width: 60px;
+            height: 60px;
+            background: #10b981;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
+            font-size: 35px;
             color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        h1 {
+            color: white;
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .controls {
@@ -60,94 +128,102 @@
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 20px;
         }
 
         button {
-            background: #00ff88;
-            color: #333;
+            background: #06b6d4;
+            color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         button:hover {
-            background: #00cc6a;
+            background: #0891b2;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 5px 20px rgba(6, 182, 212, 0.4);
         }
 
         .checklist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
         .checklist-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 0;
+            padding: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
         }
 
         .section-header {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 30px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 20px;
+            border-bottom: 2px solid rgba(6, 182, 212, 0.3);
         }
 
         .section-number {
-            width: 60px;
-            height: 60px;
-            background: #00ffdd;
-            color: #333;
-            border-radius: 15px;
+            width: 70px;
+            height: 70px;
+            background: #06b6d4;
+            color: #0f172a;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            font-weight: bold;
+            font-size: 40px;
+            font-weight: 900;
+            flex-shrink: 0;
         }
 
         .section-title {
-            color: #333;
-            font-size: 24px;
-            font-weight: bold;
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+        }
+
+        .items-container {
+            padding: 35px;
         }
 
         .checklist-item {
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: #f8f9fa;
-            border-radius: 10px;
+            padding: 18px 0;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
         }
 
         .checklist-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-
-        .checklist-item.checked {
-            background: #d4edda;
+            padding-left: 10px;
         }
 
         .checkbox {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #667eea;
+            width: 26px;
+            height: 26px;
+            border: 3px solid rgba(6, 182, 212, 0.6);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -157,111 +233,166 @@
         }
 
         .checklist-item.checked .checkbox {
-            background: #00ff88;
-            border-color: #00ff88;
+            background: #10b981;
+            border-color: #10b981;
         }
 
         .checklist-item.checked .checkbox::after {
             content: '✓';
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
         }
 
         .item-text {
-            color: #333;
-            font-size: 16px;
+            color: #e2e8f0;
+            font-size: 17px;
             flex-grow: 1;
+            line-height: 1.5;
         }
 
         .checklist-item.checked .item-text {
             text-decoration: line-through;
-            opacity: 0.7;
+            opacity: 0.5;
         }
 
-        .progress-bar {
-            background: rgba(255, 255, 255, 0.95);
+        .footer-brand {
+            text-align: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-top: 60px;
+            text-transform: uppercase;
+        }
+
+        .add-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 35px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            color: #333;
-            font-weight: bold;
+        .add-section h3 {
+            color: white;
+            margin-bottom: 25px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .progress-track {
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff88, #00ffdd);
-            transition: width 0.3s;
-            border-radius: 10px;
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: rgba(226, 232, 240, 0.5);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
         }
 
         input[type="file"] {
             display: none;
         }
 
-        .add-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        .progress-bar {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .add-section h3 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 15px;
-            font-size: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 100px;
+        .progress-track {
+            height: 25px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(6, 182, 212, 0.3);
         }
 
-        @media (max-width: 768px) {
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #06b6d4);
+            transition: width 0.5s ease;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        @media (max-width: 1024px) {
             .checklist-grid {
                 grid-template-columns: 1fr;
             }
 
             h1 {
-                font-size: 1.8em;
+                font-size: 2em;
+            }
+
+            .corner-deco,
+            .dots-deco,
+            .arrow-deco {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
+    <div class="corner-deco"></div>
+    <div class="dots-deco">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+    <div class="arrow-deco"></div>
+
     <div class="container">
         <header>
-            <h1>
+            <div class="header-content">
                 <span class="check-icon">✓</span>
-                GERENCIADOR DE CHECKLIST
-            </h1>
+                <h1>Web Design Checklist</h1>
+            </div>
             <div class="controls">
                 <button onclick="downloadConfig()">📥 Download JSON</button>
                 <button onclick="document.getElementById('fileInput').click()">📤 Upload JSON</button>
-                <button onclick="resetChecklist()">🔄 Resetar Checklist</button>
-                <button onclick="clearAll()">🗑️ Limpar Tudo</button>
+                <button onclick="resetChecklist()">🔄 Resetar</button>
+                <button onclick="clearAll()">🗑️ Limpar</button>
             </div>
             <input type="file" id="fileInput" accept=".json" onchange="uploadConfig(event)">
         </header>
@@ -280,10 +411,12 @@
 
         <div class="add-section">
             <h3>➕ Adicionar Nova Seção</h3>
-            <input type="text" id="newSectionTitle" placeholder="Título da seção (ex: DESIGN)">
-            <textarea id="newSectionItems" placeholder="Itens (um por linha)&#10;Ex:&#10;Check responsiveness&#10;Validate HTML/CSS&#10;Optimize images"></textarea>
+            <input type="text" id="newSectionTitle" placeholder="Título da seção">
+            <textarea id="newSectionItems" placeholder="Itens (um por linha)"></textarea>
             <button onclick="addSection()">Adicionar Seção</button>
         </div>
+
+        <div class="footer-brand">DIGITALSILK</div>
     </div>
 
     <script>
@@ -337,6 +470,9 @@
                 `;
                 sectionDiv.appendChild(header);
 
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'items-container';
+
                 section.items.forEach((item, itemIndex) => {
                     const itemDiv = document.createElement('div');
                     const itemId = `${sectionIndex}-${itemIndex}`;
@@ -347,9 +483,10 @@
                         <div class="checkbox"></div>
                         <div class="item-text">${item}</div>
                     `;
-                    sectionDiv.appendChild(itemDiv);
+                    itemsContainer.appendChild(itemDiv);
                 });
 
+                sectionDiv.appendChild(itemsContainer);
                 grid.appendChild(sectionDiv);
             });
 
